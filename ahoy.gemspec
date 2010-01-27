@@ -1,0 +1,15 @@
+Gem::Specification.new do |s|
+  s.name = "ahoy"
+  s.version = "0.0.1"
+  s.summary = "Bonjour Chat for Ruby"
+  s.description = "Serverless Messaging using DNSDS/mDNS, XMPP, and Ruby"
+  s.files = Dir["lib/**/*.rb"]
+  s.require_path = "lib"
+  s.has_rdoc = false
+  s.rdoc_options << "--inline-source" << "--charset=UTF-8"
+  s.author = "Mat Sadler"
+  s.email = "mat@sourcetagsandcodes.com"
+  s.homepage = "http://sourcetagsandcodes.com"
+  s.add_dependency("dnssd", [">= 1.3.1"])
+  s.add_dependency("xmpp4r", ["= 0.5"])
+end
