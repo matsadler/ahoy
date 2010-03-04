@@ -3,7 +3,7 @@ Gem::Specification.new do |s|
   s.version = "0.0.1"
   s.summary = "Bonjour Chat for Ruby"
   s.description = "Serverless Messaging using DNSDS/mDNS, XMPP, and Ruby"
-  s.files = Dir["lib/**/*.rb"]
+  s.files = Dir["lib/**/*.rb"] << "readme.rdoc"
   s.require_path = "lib"
   s.has_rdoc = false
   s.rdoc_options << "--inline-source" << "--charset=UTF-8"

@@ -1,0 +1,43 @@
+=Ahoy
+Serverless Messaging using Bonjour/DNSDS/mDNS, XMPP, and Ruby
+
+Wha?
+
+In simpler terms, this is a library for sending messages to iChat (or Adium, Pidgin, etc) using the Bonjour chat protocol.
+
+The Bonjour chat protocol is pretty much XMPP with the presence and server parts ripped out and replaced Bonjour (DNS Service Discovery and multicast DNS). Like standard XMPP while mainly used as for instant messaging, there is nothing stopping you for using it for a more generic messaging system, a presence system or interprocess communication.
+
+Ahoy isn't much more than a wrapper with a nice API around the dnssd and xmpp4r gems.
+
+Right now receiving messages isn't implemented, but it's next on the list.
+
+The API is based around the idea that this is an instant messaging protocol, there is a user, that user has a list of contacts, you can start a chat with a contact and send messages the contact though that chat session. This may be refined, but is unlikely to change in it's outlook.
+
+Example:
+
+  require 'rubygems'
+  require 'ahoy'
+  
+  mat = Ahoy::User.new("mat")
+  mat.sign_in
+  
+  sleep 1                               # wait for the contact list to populate
+  
+  first_contact = user.contacts.first   # find someone to talk to
+  
+  chat = mat.chat(first_contact)        # open a chat with them
+  
+  chat.send("We come in peace.")        # send a message
+  
+  chat.close
+
+The current use case is to send a message to a team of developers when a deploy script is run, there is a simplified interface for this:
+
+  require 'rubygems'
+  require 'ahoy/broadcast'
+  
+  username = "Dr. Nick"
+  cast = Ahoy::Broadcast.new(username)
+  
+  cast.send("Hi, everybody!")
+  cast.close
