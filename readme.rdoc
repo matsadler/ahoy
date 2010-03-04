@@ -9,8 +9,6 @@ The Bonjour chat protocol is pretty much XMPP with the presence and server parts
 
 Ahoy isn't much more than a wrapper with a nice API around the dnssd and xmpp4r gems.
 
-Right now receiving messages isn't implemented, but it's next on the list.
-
 The API is based around the idea that this is an instant messaging protocol, there is a user, that user has a list of contacts, you can start a chat with a contact and send messages the contact though that chat session. This may be refined, but is unlikely to change in it's outlook.
 
 Example:
@@ -29,7 +27,30 @@ Example:
   
   chat.send("We come in peace.")        # send a message
   
+  puts chat.receive                     # blocks until we get a response
+  
   chat.close
+
+Along with the blocking Chat#receive method to receive replies, there is an on_reply method that takes a callback. This method returns immediately, and the block is only called when there is a reply, and can be used like so
+
+  require 'rubygems'
+  require 'ahoy'
+  
+  user = Ahoy::User.new("mat")
+  user.sign_in
+  sleep 1
+  chat = user.chat(user.contacts.first)
+  
+  chat.on_reply do |reply|
+    puts reply
+  end
+  
+  chat.send("hello")
+  
+  # do something while we wait for a reply
+  loop do
+    sleep 1
+  end
 
 The current use case is to send a message to a team of developers when a deploy script is run, there is a simplified interface for this:
 
