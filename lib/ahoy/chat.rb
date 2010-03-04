@@ -37,6 +37,32 @@ module Ahoy
       message
     end
     
+    def on_reply(&block)
+      start unless client
+      client.delete_message_callback("on_reply")
+      
+      client.add_message_callback(0, "on_reply") do |message|
+        block.call(message.body) if message.type == :chat
+      end
+    end
+    
+    def receive
+      start unless client
+      thread = Thread.current
+      reply = nil
+      
+      client.add_message_callback(0, "receive") do |message|
+        if message.type == :chat
+          reply = message.body
+          thread.run
+        end
+      end
+      Thread.stop
+      
+      client.delete_message_callback("receive")
+      reply
+    end
+    
     def close
       client.close
       self.client = nil
