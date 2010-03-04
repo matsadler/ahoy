@@ -36,8 +36,8 @@ The current use case is to send a message to a team of developers when a deploy 
   require 'rubygems'
   require 'ahoy/broadcast'
   
-  username = "Dr. Nick"
-  cast = Ahoy::Broadcast.new(username)
+  user = Ahoy::User.new("Dr. Nick")
+  cast = Ahoy::Broadcast.new(user)
   
   cast.send("Hi, everybody!")
   cast.close

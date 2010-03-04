@@ -2,8 +2,7 @@ require File.expand_path("#{File.dirname(__FILE__)}/../ahoy")
 
 module Ahoy
   class Broadcast
-    def initialize(name, location="nowhere", domain="local")
-      user = Ahoy::User.new(name, location, domain)
+    def initialize(user)
       user.sign_in
       sleep 1
       @chats = user.contacts.map {|contact| user.chat(contact)}
