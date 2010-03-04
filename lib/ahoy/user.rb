@@ -16,7 +16,7 @@ module Ahoy
       
       @port = 5562
       @flags = 0
-      @interface = "en0"
+      @interface = DNSSD::InterfaceAny
     end
     
     def name
