@@ -52,6 +52,14 @@ Along with the blocking Chat#receive method to receive replies, there is an on_r
     sleep 1
   end
 
+If you are sending messages to a contact on the same machine (likely while testing, sending messages to yourself in iChat), you may need to set the interface on the user to your primary network interface:
+
+  user = Ahoy::User.new("mat")
+  user.interface = "en1"   # on Mac OS X en1 is usually Wi-Fi, en0 is ethernet
+  user.sign_in
+  
+  ...
+
 The current use case is to send a message to a team of developers when a deploy script is run, there is a simplified interface for this:
 
   require 'rubygems'
