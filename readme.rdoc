@@ -18,14 +18,14 @@ Example:
   require 'rubygems'
   require 'ahoy'
   
-  mat = Ahoy::User.new("mat")
-  mat.sign_in
+  user = Ahoy::User.new("mat")
+  user.sign_in
   
   sleep 1                               # wait for the contact list to populate
   
   first_contact = user.contacts.first   # find someone to talk to
   
-  chat = mat.chat(first_contact)        # open a chat with them
+  chat = user.chat(first_contact)       # open a chat with them
   
   chat.send("We come in peace.")        # send a message
   
