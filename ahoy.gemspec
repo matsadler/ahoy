@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "ahoy"
-  s.version = "0.0.1"
+  s.version = "0.0.2"
   s.summary = "Bonjour Chat for Ruby"
   s.description = "Serverless Messaging using DNSDS/mDNS, XMPP, and Ruby"
   s.files = Dir["lib/**/*.rb"] << "readme.rdoc"
