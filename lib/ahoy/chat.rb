@@ -4,8 +4,9 @@ require File.expand_path("#{File.dirname(__FILE__)}/xmpp4r_hack")
 
 module Ahoy
   class Chat
-    attr_reader :user, :contact, :client
-    private :client
+    attr_reader :user, :contact
+    attr_accessor :client
+    protected :client, :client=
     
     def initialize(user, contact)
       @user = user
@@ -28,7 +29,7 @@ module Ahoy
       message = Jabber::Message.new(contact.name, message)
       message.type = :chat
       begin
-        @client.send(message)
+        client.send(message)
       rescue IOError
         connect
         retry
@@ -37,18 +38,18 @@ module Ahoy
     end
     
     def close
-      @client.close
-      @client = nil
+      client.close
+      self.client = nil
     end
     
     private
     def connect
       contact.resolve
       
-      @client = Jabber::Client.new(Jabber::JID.new(user.name))
+      self.client = Jabber::Client.new(Jabber::JID.new(user.name))
       sleep 0.5
       begin
-        @client.connect(contact.target, contact.port, user.contact.ip)
+        client.connect(contact.target, contact.port, user.contact.ip)
       rescue Errno::ECONNREFUSED
         raise Ahoy::ContactOfflineError.new("Contact Offline")
       end
