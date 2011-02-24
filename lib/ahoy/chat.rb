@@ -1,6 +1,5 @@
 require 'rubygems'
 require 'xmpp4r'
-require File.expand_path("#{File.dirname(__FILE__)}/xmpp4r_hack")
 
 module Ahoy
   class Chat
@@ -74,9 +73,8 @@ module Ahoy
       
       self.client = Jabber::Client.new(Jabber::JID.new(user.name))
       @client.features_timeout = 0.001
-      sleep 0.5
       begin
-        client.connect(contact.target, contact.port, user.contact.ip)
+        client.connect(contact.target, contact.port)
       rescue Errno::ECONNREFUSED
         raise Ahoy::ContactOfflineError.new("Contact Offline")
       end
