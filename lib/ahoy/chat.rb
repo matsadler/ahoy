@@ -92,7 +92,7 @@ module Ahoy
       contact.resolve
       
       self.client = Jabber::Client.new(Jabber::JID.new(user.name))
-      @client.features_timeout = 0.001
+      client.features_timeout = 0.001
       begin
         client.connect(contact.target, contact.port)
       rescue Errno::ECONNREFUSED
