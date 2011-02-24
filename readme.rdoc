@@ -52,6 +52,8 @@ Along with the blocking Chat#receive method to receive replies, there is an on_r
     sleep 1
   end
 
+Messages can be formatted using markdown, simply set Chat#use_markdown (or Ahoy.use_markdown for the global default). Ahoy will use any of the following markdown processors, in order of preference: rdiscount, kramdown, maruku, bluecloth.
+
 If you are sending messages to a contact on the same machine (likely while testing, sending messages to yourself in iChat), you may need to set the interface on the user to your primary network interface:
 
   user = Ahoy::User.new("mat")

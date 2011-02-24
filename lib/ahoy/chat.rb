@@ -11,6 +11,7 @@ module Ahoy
       @user = user
       @contact = contact
       @client = nil
+      self.use_markdown = Ahoy.use_markdown
     end
     
     # May raise Ahoy::ContactOfflineError
@@ -22,11 +23,12 @@ module Ahoy
     
     # May raise Ahoy::ContactOfflineError
     # 
-    def send(message)
+    def send(text)
       start unless client
       
-      message = Jabber::Message.new(contact.name, message)
+      message = Jabber::Message.new(contact.name, text)
       message.type = :chat
+      markdown(message) if markdown?
       begin
         client.send(message)
       rescue IOError
@@ -67,6 +69,24 @@ module Ahoy
       self.client = nil
     end
     
+    def use_markdown=(value)
+      @use_markdown = value
+      if value && !markdown_processor
+        %W{rdiscount kramdown maruku bluecloth}.each do |lib|
+          begin
+            require lib
+            break
+          rescue LoadError
+          end
+        end
+      end
+    end
+    
+    def markdown?
+      @use_markdown && markdown_processor
+    end
+    alias use_markdown markdown?
+    
     private
     def connect
       contact.resolve
@@ -78,6 +98,22 @@ module Ahoy
       rescue Errno::ECONNREFUSED
         raise Ahoy::ContactOfflineError.new("Contact Offline")
       end
+    end
+    
+    def markdown(message)
+      html = REXML::Element.new("html")
+      html.add_attribute("xmlns", "http://www.w3.org/1999/xhtml")
+      body = html.add_element("body")
+      markdown = markdown_processor.new(message.body)
+      body.add_element(REXML::Document.new(markdown.to_html))
+      message.add_element(html)
+    end
+    
+    def markdown_processor
+      return RDiscount if defined?(RDiscount)
+      return Kramdown::Document if defined?(Kramdown::Document)
+      return Maruku if defined?(Maruku)
+      return BlueCloth if defined?(BlueCloth)
     end
     
   end
