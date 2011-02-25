@@ -1,3 +1,4 @@
+require 'socket'
 require 'rubygems'
 require 'dnssd'
 
@@ -43,6 +44,36 @@ module Ahoy
       Ahoy::Chat.new(self, contact)
     end
     
+    def listen
+      sock = server.accept
+      sock_domain, remote_port, remote_hostname, remote_ip = sock.peeraddr
+      other = contacts.find do |contact|
+        contact.ip_addresses.include?(remote_ip)
+      end
+      
+      client = Jabber::Client.new(Jabber::JID.new(name))
+      client.features_timeout = 0.001
+      client.instance_variable_set(:@socket, sock)
+      client.start
+      client.accept_features
+      client.instance_variable_set(:@keepaliveThread, Thread.new do
+        Thread.current.abort_on_exception = true
+        client.__send__(:keepalive_loop)
+      end)
+      
+      chat = Ahoy::Chat.new(self, other)
+      chat.instance_variable_set(:@client, client)
+      chat
+    end
+    
+    def on_chat(&block)
+      Thread.new do
+        while chat = listen
+          Thread.new {block.call(chat)}
+        end
+      end
+    end
+    
     private
     def txt_record(status, msg)
       DNSSD::TextRecord.new(
@@ -51,6 +82,10 @@ module Ahoy
        "status" => status,
        "msg" => msg,
        "1st" => short_name)
+    end
+    
+    def server
+      @server ||= TCPServer.new("0.0.0.0", port)
     end
     
   end
