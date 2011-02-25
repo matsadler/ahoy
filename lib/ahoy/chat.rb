@@ -17,7 +17,6 @@ module Ahoy
     # May raise Ahoy::ContactOfflineError
     # 
     def start
-      user.contact.resolve.getaddrinfo
       connect
     end
     
@@ -89,12 +88,11 @@ module Ahoy
     
     private
     def connect
-      contact.resolve
-      
       self.client = Jabber::Client.new(Jabber::JID.new(user.name))
       client.features_timeout = 0.001
       begin
-        client.connect(contact.target, contact.port)
+        contact.resolve
+        client.connect(contact.target(true), contact.port(true))
       rescue Errno::ECONNREFUSED
         raise Ahoy::ContactOfflineError.new("Contact Offline")
       end

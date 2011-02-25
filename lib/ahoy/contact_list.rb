@@ -23,12 +23,18 @@ module Ahoy
       end
     end
     
+    def [](name)
+      find {|c| c.fullname == name || c.name == name} || find_in_weak_list(name)
+    end
+    
     private
     def start_browse
       DNSSD.browse(Ahoy::SERVICE_TYPE) do |browsed|
-        # next if Ahoy::more_coming?(browsed)
         if Ahoy::add?(browsed) && browsed.name != user.name
-          add(Ahoy::Contact.new(browsed.name, browsed.domain))
+          contact = self[browsed.fullname] || Ahoy::Contact.new(browsed.name, browsed.domain)
+          contact.online = true
+          contact.add_interface(browsed.interface)
+          lock.synchronize {list.push(contact)}
         elsif Ahoy::add?(browsed)
           user.contact = Ahoy::Contact.new(browsed.name, browsed.domain)
         else
@@ -37,20 +43,10 @@ module Ahoy
       end
     end
     
-    def add(contact)
+    def remove(name)
+      name = name.fullname if name.respond_to?(:fullname)
       lock.synchronize do
-        unless list.find {|in_list| contact == in_list}
-          contact ||= find_in_weak_list(contact)
-          contact.online = true
-          list.push(contact)
-        end
-      end
-    end
-    
-    def remove(fullname)
-      fullname = fullname.fullname if fullname.respond_to?(:fullname)
-      lock.synchronize do
-        contact = list.find {|c| c.fullname == fullname}
+        contact = list.find {|c| c.fullname == name || c.name == name}
         if contact
           list.delete(contact)
           contact.online = false
@@ -60,16 +56,17 @@ module Ahoy
       end
     end
     
-    def find_in_weak_list(contact)
-      existing_contact = nil
+    def find_in_weak_list(name)
+      name = name.fullname if name.respond_to?(:fullname)
+      contact = nil
       Thread.exclusive do
         GC.disable
-        weak_list.select! {|ref| ref.weakref_alive?}
-        contact_ref = weak_list.find {|ref| contact == ref}
-        existing_contact = contact_ref.__getobj__
+        weak_list.reject! {|ref| !ref.weakref_alive?}
+        refrence = weak_list.find {|ref| ref.fullname == name||ref.name == name}
+        contact = refrence.__getobj__ if refrence
         GC.enable
       end
-      existing_contact
+      contact
     end
     
   end
