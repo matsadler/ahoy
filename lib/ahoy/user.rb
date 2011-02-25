@@ -45,25 +45,12 @@ module Ahoy
     end
     
     def listen
-      sock = server.accept
-      sock_domain, remote_port, remote_hostname, remote_ip = sock.peeraddr
+      socket = server.accept
+      domain, port, hostname, ip = socket.peeraddr
       other = contacts.find do |contact|
-        contact.ip_addresses.include?(remote_ip)
+        contact.ip_addresses.include?(ip)
       end
-      
-      client = Jabber::Client.new(Jabber::JID.new(name))
-      client.features_timeout = 0.001
-      client.instance_variable_set(:@socket, sock)
-      client.start
-      client.accept_features
-      client.instance_variable_set(:@keepaliveThread, Thread.new do
-        Thread.current.abort_on_exception = true
-        client.__send__(:keepalive_loop)
-      end)
-      
-      chat = Ahoy::Chat.new(self, other)
-      chat.instance_variable_set(:@client, client)
-      chat
+      Ahoy::Chat.new(self, other, socket)
     end
     
     def on_chat(&block)

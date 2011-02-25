@@ -7,10 +7,11 @@ module Ahoy
     attr_accessor :client
     protected :client, :client=
     
-    def initialize(user, contact)
+    def initialize(user, contact, socket=nil)
       @user = user
       @contact = contact
       @client = nil
+      connect_with(socket) if socket
       self.use_markdown = Ahoy.use_markdown
     end
     
@@ -82,14 +83,30 @@ module Ahoy
     
     private
     def connect
-      self.client = Jabber::Client.new(Jabber::JID.new(user.name))
-      client.features_timeout = 0.001
+      self.client = new_client
       begin
         contact.resolve
         client.connect(contact.target(true), contact.port(true))
       rescue Errno::ECONNREFUSED
         raise Ahoy::ContactOfflineError.new("Contact Offline")
       end
+    end
+    
+    def connect_with(socket)
+      self.client = new_client
+      client.instance_variable_set(:@socket, socket)
+      client.start
+      client.accept_features
+      client.instance_variable_set(:@keepaliveThread, Thread.new do
+        Thread.current.abort_on_exception = true
+        client.__send__(:keepalive_loop)
+      end)
+    end
+    
+    def new_client
+      client = Jabber::Client.new(Jabber::JID.new(user.name))
+      client.features_timeout = 0.001
+      client
     end
     
     def markdown(message)
