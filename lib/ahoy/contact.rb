@@ -6,7 +6,7 @@ module Ahoy
     attr_reader :name, :domain, :target, :ip, :port, :interface
     attr_accessor :online
     
-    def initialize(name, domain="local")
+    def initialize(name, domain="local.")
       @name = name
       @domain = domain
       @target = nil

@@ -6,7 +6,7 @@ module Ahoy
     attr_reader :short_name, :location, :domain, :contacts
     attr_accessor :port, :flags, :interface, :contact
     
-    def initialize(name, location="nowhere", domain="local")
+    def initialize(name, location="nowhere", domain="local.")
       @short_name = name
       @location = location
       @domain = domain
