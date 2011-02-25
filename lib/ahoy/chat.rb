@@ -16,14 +16,8 @@ module Ahoy
     
     # May raise Ahoy::ContactOfflineError
     # 
-    def start
-      connect
-    end
-    
-    # May raise Ahoy::ContactOfflineError
-    # 
     def send(text)
-      start unless client
+      connect unless client
       
       message = Jabber::Message.new(contact.name, text)
       message.type = :chat
@@ -38,7 +32,7 @@ module Ahoy
     end
     
     def on_reply(&block)
-      start unless client
+      connect unless client
       client.delete_message_callback("on_reply")
       
       client.add_message_callback(0, "on_reply") do |message|
@@ -47,7 +41,7 @@ module Ahoy
     end
     
     def receive
-      start unless client
+      connect unless client
       thread = Thread.current
       reply = nil
       
