@@ -24,7 +24,7 @@ module Ahoy
     end
     
     def [](name)
-      find {|c| c.fullname == name || c.name == name} || find_in_weak_list(name)
+      find {|c| name === c.fullname || name === c.name}||find_in_weak_list(name)
     end
     
     private
@@ -41,10 +41,9 @@ module Ahoy
       end
     end
     
-    def remove(name)
-      name = name.fullname if name.respond_to?(:fullname)
+    def remove(fullname)
       lock.synchronize do
-        contact = list.find {|c| c.fullname == name || c.name == name}
+        contact = list.find {|c| c.fullname == fullname}
         if contact
           list.delete(contact)
           contact.online = false
@@ -60,7 +59,7 @@ module Ahoy
       Thread.exclusive do
         GC.disable
         weak_list.reject! {|ref| !ref.weakref_alive?}
-        refrence = weak_list.find {|ref| ref.fullname == name||ref.name == name}
+        refrence = weak_list.find {|ref| name===ref.fullname || name===ref.name}
         contact = refrence.__getobj__ if refrence
         GC.enable
       end
