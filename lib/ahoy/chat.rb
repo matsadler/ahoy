@@ -7,6 +7,11 @@ module Ahoy
     attr_accessor :client
     protected :client, :client=
     
+    # :call-seq: Chat.new(user, contact, socket=nil) -> chat
+    # 
+    # Create a new Ahoy::Chat. If socket is supplied assume it is a just
+    # accepted incomming connection, and start a chat on it.
+    # 
     def initialize(user, contact, socket=nil)
       @user = user
       @contact = contact
@@ -15,7 +20,9 @@ module Ahoy
       self.use_markdown = Ahoy.use_markdown
     end
     
-    # May raise Ahoy::ContactOfflineError
+    # :call-seq: chat.send(string) -> message
+    # 
+    # Send string to contact. May raise Ahoy::ContactOfflineError.
     # 
     def send(text)
       connect unless client
@@ -32,6 +39,10 @@ module Ahoy
       message
     end
     
+    # :call-seq: chat.on_reply {|string| block }
+    # 
+    # Set up block as a callback for when a message is received.
+    # 
     def on_reply(&block)
       connect unless client
       client.delete_message_callback("on_reply")
@@ -41,6 +52,11 @@ module Ahoy
       end
     end
     
+    # :call-seq: chat.receive -> string
+    # 
+    # Block until a message is received, then return the message body as a
+    # string.
+    # 
     def receive
       connect unless client
       thread = Thread.current
@@ -58,11 +74,20 @@ module Ahoy
       reply
     end
     
+    # :call-seq: chat.close -> nil
+    # 
+    # End the chat.
+    # 
     def close
       client.close
       self.client = nil
     end
     
+    # :call-seq: chat.use_markdown = bool -> bool
+    # 
+    # Set true to send a html copy of messages, by interpreting the message text
+    # as markdown.
+    # 
     def use_markdown=(value)
       @use_markdown = value
       if value && !markdown_processor
@@ -74,8 +99,13 @@ module Ahoy
           end
         end
       end
+      value
     end
     
+    # :call-seq: chat.markdown? -> bool
+    # 
+    # Are messages sent to this chat being interpreted as markdown?
+    # 
     def markdown?
       @use_markdown && markdown_processor
     end

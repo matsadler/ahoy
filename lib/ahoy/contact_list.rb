@@ -8,6 +8,10 @@ module Ahoy
     attr_reader :list, :weak_list, :lock, :user
     private :list, :weak_list, :lock
     
+    # :call-seq: ContactList.new(user) -> contact_list
+    # 
+    # Create a new Ahoy::ContactList.
+    # 
     def initialize(user)
       @user = user
       @list = []
@@ -17,12 +21,24 @@ module Ahoy
       start_browse
     end
     
+    # :call-seq: contact_list.each {|contact| block } -> contact_list
+    # 
+    # Calls block once for each contact in the contact list.
+    # 
     def each(&block)
       lock.synchronize do
         list.each(&block)
       end
+      self
     end
     
+    # :call-seq: contact_list[name] -> contact or nil
+    # 
+    # Returns the first contact who's fullname or name matches name.
+    # 
+    # The case equality operator (===) is used in the comparison, so strings or
+    # regexps can be used as the argument.
+    # 
     def [](name)
       find {|c| name === c.fullname || name === c.name}||find_in_weak_list(name)
     end
