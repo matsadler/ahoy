@@ -35,11 +35,6 @@ module Ahoy
         interface)
     end
     
-    def contact
-      sleep 0.01 until @contact
-      @contact
-    end
-    
     def chat(contact)
       Ahoy::Chat.new(self, contact)
     end

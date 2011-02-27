@@ -35,8 +35,6 @@ module Ahoy
           contact.online = true
           contact.add_interface(browsed.interface)
           lock.synchronize {list.push(contact)}
-        elsif Ahoy::add?(browsed)
-          user.contact = Ahoy::Contact.new(browsed.name, browsed.domain)
         else
           remove(browsed.fullname)
         end
