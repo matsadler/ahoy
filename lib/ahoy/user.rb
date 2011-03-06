@@ -5,7 +5,7 @@ require 'dnssd'
 module Ahoy
   class User
     attr_reader :short_name, :location, :domain, :contacts
-    attr_accessor :port, :flags, :interface, :contact
+    attr_accessor :port, :flags, :interface
     
     # :call-seq: User.new(name, location="nowhere", domain="local.") -> user
     # 
@@ -19,7 +19,6 @@ module Ahoy
       @domain = domain
       
       @contacts = Ahoy::ContactList.new(self)
-      @contact = nil
       
       @port = 5562
       @flags = 0
