@@ -1,6 +1,15 @@
 require File.expand_path("#{File.dirname(__FILE__)}/../ahoy")
 
 module Ahoy
+  
+  # Ahoy::Broadcast provides a simple interface to send a message to all online
+  # users. Example:
+  #   user = Ahoy::User.new("Dr. Nick")
+  #   cast = Ahoy::Broadcast.new(user)
+  #   
+  #   cast.send("Hi, everybody!")
+  #   cast.close
+  # 
   class Broadcast
     
     # :call-seq: Broadcast.new(user) -> broadcast

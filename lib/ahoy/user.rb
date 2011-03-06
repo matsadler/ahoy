@@ -3,6 +3,28 @@ require 'rubygems'
 require 'dnssd'
 
 module Ahoy
+  
+  # Ahoy::User represents us, or the current system, and is the entry point for
+  # using the Ahoy library.
+  # 
+  # Send a message to a specific example:
+  #   user = Ahoy::User.new("Ford")
+  #   user.sign_in
+  #   
+  #   chat = user.chat(user.contacts[/Arthur/])
+  #   chat.send("Don't panic")
+  # 
+  # Simple echo server:
+  #   user = Ahoy::User.new("echo")
+  #   user.sign_in
+  #   
+  #   user.on_chat do |chat|
+  #     chat.on_reply do |reply|
+  #       chat.send(reply)
+  #     end
+  #   end.join
+  # 
+  # 
   class User
     attr_reader :short_name, :location, :domain, :contacts
     attr_accessor :port, :flags, :interface

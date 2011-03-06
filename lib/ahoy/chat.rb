@@ -2,6 +2,11 @@ require 'rubygems'
 require 'xmpp4r'
 
 module Ahoy
+  
+  # Ahoy::Chat models a conversation between the user and one of their contacts.
+  # It can be thought of as representing an iChat chat window, or treated more
+  # like a Ruby socket.
+  # 
   class Chat
     attr_reader :user_name, :contact_name
     

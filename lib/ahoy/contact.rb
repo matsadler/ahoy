@@ -2,6 +2,10 @@ require 'rubygems'
 require 'dnssd'
 
 module Ahoy
+  
+  # Ahoy::Contact represents another user or system, available to recieve
+  # messages, or who may send them to our user.
+  # 
   class Contact
     attr_reader :name, :domain
     attr_accessor :online

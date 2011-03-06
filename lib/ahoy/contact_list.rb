@@ -2,6 +2,10 @@ require 'thread'
 require 'weakref'
 
 module Ahoy
+  
+  # Ahoy::ContactList is a self-populating collection of Contacts, and provides
+  # methods to retrieve and iterate over its contents.
+  # 
   class ContactList
     include Enumerable
     
