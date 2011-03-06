@@ -18,7 +18,7 @@ module Ahoy
       @location = location
       @domain = domain
       
-      @contacts = Ahoy::ContactList.new(self)
+      @contacts = Ahoy::ContactList.new(name)
       
       @port = 5562
       @flags = 0

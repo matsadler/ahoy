@@ -5,15 +5,16 @@ module Ahoy
   class ContactList
     include Enumerable
     
-    attr_reader :list, :weak_list, :lock, :user
+    attr_reader :list, :weak_list, :lock, :user_name
     private :list, :weak_list, :lock
     
-    # :call-seq: ContactList.new(user) -> contact_list
+    # :call-seq: ContactList.new(user_name=nil) -> contact_list
     # 
-    # Create a new Ahoy::ContactList.
+    # Create a new Ahoy::ContactList. Provide a username as the argument to
+    # avoid adding our user to the list.
     # 
-    def initialize(user)
-      @user = user
+    def initialize(user_name=nil)
+      @user_name = user_name
       @list = []
       @weak_list = []
       @lock = Mutex.new
@@ -55,7 +56,7 @@ module Ahoy
     private
     def start_browse
       DNSSD.browse(Ahoy::SERVICE_TYPE) do |browsed|
-        if Ahoy::add?(browsed) && browsed.name != user.name
+        if Ahoy::add?(browsed) && browsed.name != user_name
           contact = self[browsed.fullname] || Ahoy::Contact.new(browsed.name, browsed.domain)
           contact.online = true
           contact.add_interface(browsed.interface)
