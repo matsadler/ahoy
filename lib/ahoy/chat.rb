@@ -3,21 +3,41 @@ require 'xmpp4r'
 
 module Ahoy
   class Chat
-    attr_reader :user, :contact
-    attr_accessor :client
-    protected :client, :client=
+    attr_reader :user_name, :contact_name
     
-    # :call-seq: Chat.new(user, contact, socket=nil) -> chat
+    # :call-seq: Chat.new(user_name, contact_name) -> chat
     # 
-    # Create a new Ahoy::Chat. If socket is supplied assume it is a just
-    # accepted incomming connection, and start a chat on it.
+    # Create a new Ahoy::Chat.
     # 
-    def initialize(user, contact, socket=nil)
-      @user = user
-      @contact = contact
+    def initialize(user_name, contact_name)
+      @user_name = user_name
+      @contact_name = contact_name
       @client = nil
-      connect_with(socket) if socket
       self.use_markdown = Ahoy.use_markdown
+    end
+    
+    # :call-seq: chat.connect(target, port) -> chat
+    # chat.connect(socket) -> chat
+    # 
+    # Connect to target on port, or use the connection provided by socket.
+    # 
+    def connect(host, port=nil)
+      if host.respond_to?(:read) && host.respond_to?(:write)
+        connect_with(host)
+      else
+        begin
+          client.connect(host, port)
+        rescue Errno::ECONNREFUSED
+          raise Ahoy::ContactOfflineError.new("Contact Offline")
+        end
+      end
+      self
+    end
+    
+    # :call-seq: chat.connected? -> bool
+    # 
+    def connected?
+      client.is_connected?
     end
     
     # :call-seq: chat.send(string) -> message
@@ -25,17 +45,12 @@ module Ahoy
     # Send string to contact. May raise Ahoy::ContactOfflineError.
     # 
     def send(text)
-      connect unless client
+      raise Ahoy::NotConnectedError.new("Not Connected") unless connected?
       
-      message = Jabber::Message.new(contact.name, text)
+      message = Jabber::Message.new(contact_name, text)
       message.type = :chat
       markdown(message) if markdown?
-      begin
-        client.send(message)
-      rescue IOError
-        connect
-        retry
-      end
+      client.send(message)
       message
     end
     
@@ -44,7 +59,6 @@ module Ahoy
     # Set up block as a callback for when a message is received.
     # 
     def on_reply(&block)
-      connect unless client
       client.delete_message_callback("on_reply")
       
       client.add_message_callback(0, "on_reply") do |message|
@@ -58,7 +72,6 @@ module Ahoy
     # string.
     # 
     def receive
-      connect unless client
       thread = Thread.current
       reply = nil
       
@@ -80,7 +93,7 @@ module Ahoy
     # 
     def close
       client.close
-      self.client = nil
+      @client = nil
     end
     
     # :call-seq: chat.use_markdown = bool -> bool
@@ -112,18 +125,7 @@ module Ahoy
     alias use_markdown markdown?
     
     private
-    def connect
-      self.client = new_client
-      begin
-        contact.resolve
-        client.connect(contact.target(true), contact.port(true))
-      rescue Errno::ECONNREFUSED
-        raise Ahoy::ContactOfflineError.new("Contact Offline")
-      end
-    end
-    
     def connect_with(socket)
-      self.client = new_client
       client.instance_variable_set(:@socket, socket)
       client.start
       client.accept_features
@@ -133,10 +135,11 @@ module Ahoy
       end)
     end
     
-    def new_client
-      client = Jabber::Client.new(Jabber::JID.new(user.name))
-      client.features_timeout = 0.001
-      client
+    def client
+      return @client if @client
+      @client = Jabber::Client.new(Jabber::JID.new(user_name))
+      @client.features_timeout = 0.001
+      @client
     end
     
     def markdown(message)

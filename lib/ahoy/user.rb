@@ -55,7 +55,8 @@ module Ahoy
     # Initiate a new chat session with contact.
     # 
     def chat(contact)
-      Ahoy::Chat.new(self, contact)
+      chat = Ahoy::Chat.new(name, contact.name)
+      chat.connect(contact.target, contact.port(true))
     end
     
     # :call-seq: user.listen -> chat
@@ -69,7 +70,7 @@ module Ahoy
       other = contacts.find do |contact|
         contact.ip_addresses.include?(ip)
       end
-      Ahoy::Chat.new(self, other, socket)
+      Ahoy::Chat.new(name, other.name).connect(socket)
     end
     
     # :call-seq: user.on_chat {|chat| block } -> thread
