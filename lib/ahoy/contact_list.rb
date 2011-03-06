@@ -42,6 +42,15 @@ module Ahoy
     def [](name)
       find {|c| name === c.fullname || name === c.name}||find_in_weak_list(name)
     end
+    alias find_by_name []
+    
+    # :call-seq: contact_list.find_by_ip(string) -> contact or nil
+    # 
+    # Returns the first contact with the ip address matching string.
+    # 
+    def find_by_ip(ip)
+      find {|contact| contact.ip_addresses.include?(ip)}
+    end
     
     private
     def start_browse

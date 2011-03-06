@@ -66,10 +66,7 @@ module Ahoy
     def listen
       socket = server.accept
       domain, port, hostname, ip = socket.peeraddr
-      other = contacts.find do |contact|
-        contact.ip_addresses.include?(ip)
-      end
-      Ahoy::Chat.new(name, other.name).connect(socket)
+      Ahoy::Chat.new(name, contacts.find_by_ip(ip).name).connect(socket)
     end
     
     # :call-seq: user.on_chat {|chat| block } -> thread
