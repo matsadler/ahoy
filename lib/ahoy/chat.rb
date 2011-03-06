@@ -76,7 +76,7 @@ module Ahoy
     # Block until a message is received, then return the message body as a
     # string.
     # 
-    def receive
+    def receive(*ignore_args)
       thread = Thread.current
       reply = nil
       
@@ -91,6 +91,10 @@ module Ahoy
       client.delete_message_callback("receive")
       reply
     end
+    alias read receive
+    alias sysread receive
+    alias gets receive
+    alias readline receive
     
     # :call-seq: chat.close -> nil
     # 
@@ -128,6 +132,34 @@ module Ahoy
       @use_markdown && markdown_processor
     end
     alias use_markdown markdown?
+    
+    # :call-seq: chat << string -> chat
+    # 
+    # See #send
+    # 
+    def <<(string)
+      send(string)
+      self
+    end
+    
+    # :call-seq: chat.puts(string) -> nil
+    # 
+    # See #send
+    # 
+    def puts(string)
+      send(string)
+      nil
+    end
+    
+    # :call-seq: chat.write -> integer
+    # 
+    # See #send
+    # 
+    def write(string)
+      send(string)
+      string.length
+    end
+    alias syswrite write
     
     private
     def connect_with(socket)
