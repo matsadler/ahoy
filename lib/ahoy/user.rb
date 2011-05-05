@@ -26,7 +26,7 @@ module Ahoy
   # 
   # 
   class User
-    attr_reader :short_name, :location, :domain, :contacts
+    attr_reader :display_name, :short_name, :location, :domain, :contacts
     attr_accessor :port, :flags, :interface
     
     # :call-seq: User.new(name, location="nowhere", domain="local.") -> user
@@ -35,9 +35,10 @@ module Ahoy
     # 
     # Location should be set to the bonjour/zeroconf hostname.
     # 
-    def initialize(name, location="nowhere", domain="local.")
-      @short_name = name
-      @location = location
+    def initialize(display_name, location="nowhere", domain="local.")
+      @display_name = display_name
+      @short_name = display_name.downcase.gsub(/ /, "-").gsub(/[^a-z0-9-]/, "")
+      @location = location.downcase.gsub(/ /, "-").gsub(/[^a-z0-9-]/, "")
       @domain = domain
       
       @contacts = Ahoy::ContactList.new(name)
@@ -113,7 +114,7 @@ module Ahoy
        "port.p2pj" => port,
        "status" => status,
        "msg" => msg,
-       "1st" => short_name)
+       "1st" => display_name)
     end
     
     def server
