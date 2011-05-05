@@ -61,10 +61,11 @@ module Ahoy
     def start_browse
       DNSSD.browse(Ahoy::SERVICE_TYPE) do |browsed|
         if Ahoy::add?(browsed) && browsed.name != user_name
-          contact = self[browsed.fullname] || Ahoy::Contact.new(browsed.name, browsed.domain)
+          existing = self[browsed.fullname]
+          contact = existing || Ahoy::Contact.new(browsed.name, browsed.domain)
           contact.online = true
           contact.add_interface(browsed.interface)
-          lock.synchronize {list.push(contact)}
+          lock.synchronize {list.push(contact)} unless existing
         else
           remove(browsed.fullname)
         end
