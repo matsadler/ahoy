@@ -110,19 +110,13 @@ module Ahoy
       if use_cache && @target && @port && @interface_addresses.keys.any?
         return self
       end
-      service = DNSSD::Service.new
-      main = Thread.current
       @interface_addresses.clear
-      service.resolve(name, Ahoy::SERVICE_TYPE, domain) do |resolved|
+      DNSSD::Service.new.resolve(name, Ahoy::SERVICE_TYPE, domain) do |resolved|
         @target = resolved.target
         @port = resolved.port
         @interface_addresses[resolved.interface] = []
-        unless Ahoy::more_coming?(resolved)
-          service.stop unless service.stopped?
-          main.run
-        end
+        break unless Ahoy::more_coming?(resolved)
       end
-      Thread.stop unless service.stopped?
       self
     end
     
@@ -139,15 +133,10 @@ module Ahoy
         return self
       end
       service = DNSSD::Service.new
-      main = Thread.current
       service.getaddrinfo(target(resolve_cache), 0, 0, interface) do |addressed|
         @interface_addresses[addressed.interface].push(addressed.address)
-        unless Ahoy::more_coming?(addressed)
-          service.stop unless service.stopped?
-          main.run
-        end
+        break unless Ahoy::more_coming?(addressed)
       end
-      Thread.stop unless service.stopped?
       self
     end
     

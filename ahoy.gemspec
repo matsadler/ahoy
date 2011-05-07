@@ -10,6 +10,6 @@ Gem::Specification.new do |s|
   s.author = "Mat Sadler"
   s.email = "mat@sourcetagsandcodes.com"
   s.homepage = "http://sourcetagsandcodes.com"
-  s.add_dependency("dnssd", [">= 1.3.1"])
+  s.add_dependency("dnssd", ["~> 2.0"])
   s.add_dependency("xmpp4r", ["= 0.5"])
 end
