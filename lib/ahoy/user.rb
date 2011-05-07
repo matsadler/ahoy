@@ -77,7 +77,7 @@ module Ahoy
     # Initiate a new chat session with contact.
     # 
     def chat(contact)
-      chat = Ahoy::Chat.new(name, contact.name)
+      chat = Ahoy::Chat.new(contact.name)
       chat.connect(contact.target, contact.port(true))
     end
     

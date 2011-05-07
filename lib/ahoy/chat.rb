@@ -8,14 +8,13 @@ module Ahoy
   # like a Ruby socket.
   # 
   class Chat
-    attr_reader :user_name, :contact_name
+    attr_reader :contact_name
     
-    # :call-seq: Chat.new(user_name, contact_name) -> chat
+    # :call-seq: Chat.new(contact_name) -> chat
     # 
     # Create a new Ahoy::Chat.
     # 
-    def initialize(user_name, contact_name)
-      @user_name = user_name
+    def initialize(contact_name)
       @contact_name = contact_name
       @client = nil
       self.use_markdown = Ahoy.use_markdown
@@ -174,7 +173,7 @@ module Ahoy
     
     def client
       return @client if @client
-      @client = Jabber::Client.new(Jabber::JID.new(user_name))
+      @client = Jabber::Client.new(nil)
       @client.features_timeout = 0.001
       @client
     end
