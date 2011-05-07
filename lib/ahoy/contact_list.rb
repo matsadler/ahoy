@@ -31,9 +31,7 @@ module Ahoy
     # Calls block once for each contact in the contact list.
     # 
     def each(&block)
-      lock.synchronize do
-        list.each(&block)
-      end
+      lock.synchronize {list.each(&block)}
       self
     end
     
@@ -45,7 +43,7 @@ module Ahoy
     # regexps can be used as the argument.
     # 
     def [](name)
-      find {|c| name === c.fullname || name === c.name}||find_in_weak_list(name)
+      find {|c| name === c.fullname || name === c.name}
     end
     alias find_by_name []
     
@@ -62,7 +60,8 @@ module Ahoy
       DNSSD.browse(Ahoy::SERVICE_TYPE) do |browsed|
         if browsed.flags.add? && browsed.name != user_name
           existing = self[browsed.fullname]
-          contact = existing || Ahoy::Contact.new(browsed.name, browsed.domain)
+          contact = existing || find_in_weak_list(browsed.fullname) ||
+            Ahoy::Contact.new(browsed.name, browsed.domain)
           contact.online = true
           contact.add_interface(browsed.interface)
           lock.synchronize {list.push(contact)} unless existing
@@ -84,17 +83,17 @@ module Ahoy
       end
     end
     
-    def find_in_weak_list(name)
-      name = name.fullname if name.respond_to?(:fullname)
-      contact = nil
+    def find_in_weak_list(fullname)
       Thread.exclusive do
-        GC.disable
-        weak_list.reject! {|ref| !ref.weakref_alive?}
-        refrence = weak_list.find {|ref| name===ref.fullname || name===ref.name}
-        contact = refrence.__getobj__ if refrence
-        GC.enable
+        begin
+          GC.disable
+          weak_list.reject! {|ref| !ref.weakref_alive?}
+          refrence = weak_list.find {|ref| fullname == ref.fullname}
+          refrence.__getobj__ if refrence
+        ensure
+          GC.enable
+        end
       end
-      contact
     end
     
   end
