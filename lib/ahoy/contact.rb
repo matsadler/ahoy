@@ -115,7 +115,7 @@ module Ahoy
         @target = resolved.target
         @port = resolved.port
         @interface_addresses[resolved.interface] = []
-        break unless Ahoy::more_coming?(resolved)
+        break unless resolved.flags.more_coming?
       end
       self
     end
@@ -135,7 +135,7 @@ module Ahoy
       service = DNSSD::Service.new
       service.getaddrinfo(target(resolve_cache), 0, 0, interface) do |addressed|
         @interface_addresses[addressed.interface].push(addressed.address)
-        break unless Ahoy::more_coming?(addressed)
+        break unless addressed.flags.more_coming?
       end
       self
     end

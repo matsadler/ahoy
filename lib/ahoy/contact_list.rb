@@ -60,7 +60,7 @@ module Ahoy
     private
     def start_browse
       DNSSD.browse(Ahoy::SERVICE_TYPE) do |browsed|
-        if Ahoy::add?(browsed) && browsed.name != user_name
+        if browsed.flags.add? && browsed.name != user_name
           existing = self[browsed.fullname]
           contact = existing || Ahoy::Contact.new(browsed.name, browsed.domain)
           contact.online = true
