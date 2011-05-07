@@ -9,6 +9,7 @@ module Ahoy
   class Contact
     attr_reader :name, :domain
     attr_accessor :online
+    alias online? online
     
     # :call-seq: Contact.new(name, domain="local.") -> contact
     # 
@@ -92,14 +93,6 @@ module Ahoy
     # 
     def ==(other)
       other.is_a?(self.class) && other.fullname == fullname
-    end
-    
-    # :call-seq: contact.online? -> bool
-    # 
-    # Is contact online?
-    # 
-    def online?
-      online
     end
     
     # :call-seq: contact.resolve -> contact
