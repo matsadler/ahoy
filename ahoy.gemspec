@@ -1,6 +1,6 @@
 Gem::Specification.new do |s|
   s.name = "ahoy"
-  s.version = "0.1.1"
+  s.version = "0.1.2"
   s.summary = "Bonjour Chat for Ruby"
   s.description = "Serverless Messaging using DNSDS/mDNS, XMPP, and Ruby"
   s.files = Dir["lib/**/*.rb"] << "readme.rdoc"
@@ -10,6 +10,6 @@ Gem::Specification.new do |s|
   s.author = "Mat Sadler"
   s.email = "mat@sourcetagsandcodes.com"
   s.homepage = "http://github.com/matsadler/ahoy"
-  s.add_dependency("dnssd", ["~> 2.0"])
+  s.add_dependency("dnssd", [">= 1.3.1"])
   s.add_dependency("xmpp4r", ["= 0.5"])
 end
