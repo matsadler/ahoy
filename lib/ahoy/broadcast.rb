@@ -19,7 +19,7 @@ module Ahoy
     def initialize(user)
       user.sign_in
       sleep 1
-      @chats = user.contacts.map {|cont| user.chat(cont) rescue nil}.compact!
+      @chats = user.contacts.map {|cont| user.chat(cont) rescue nil}.compact
     end
     
     # :call-seq: broadcast.send(string) -> array
